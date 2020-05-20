@@ -1,0 +1,8 @@
+C:\Users\bscenolasc\source\repos\SendMessage\SendMessage\bin\Debug\netcoreapp2.2\SendMessage.deps.json
+C:\Users\bscenolasc\source\repos\SendMessage\SendMessage\bin\Debug\netcoreapp2.2\SendMessage.dll
+C:\Users\bscenolasc\source\repos\SendMessage\SendMessage\bin\Debug\netcoreapp2.2\SendMessage.pdb
+C:\Users\bscenolasc\source\repos\SendMessage\SendMessage\obj\Debug\netcoreapp2.2\SendMessage.csproj.CoreCompileInputs.cache
+C:\Users\bscenolasc\source\repos\SendMessage\SendMessage\obj\Debug\netcoreapp2.2\SendMessage.AssemblyInfoInputs.cache
+C:\Users\bscenolasc\source\repos\SendMessage\SendMessage\obj\Debug\netcoreapp2.2\SendMessage.AssemblyInfo.cs
+C:\Users\bscenolasc\source\repos\SendMessage\SendMessage\obj\Debug\netcoreapp2.2\SendMessage.dll
+C:\Users\bscenolasc\source\repos\SendMessage\SendMessage\obj\Debug\netcoreapp2.2\SendMessage.pdb
