@@ -1,11 +1,14 @@
-﻿using Newtonsoft.Json;
+﻿using log4net;
+using Newtonsoft.Json;
 using RabbitMQ.Client;
 using SendMessage.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Runtime;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace SendMessage
 {
@@ -17,6 +20,7 @@ namespace SendMessage
         private string file = null;
         private string hostName, user, pass, cuenta, de, canal, llave;
         private List<Base64FileRequest> base64 = null;
+        private static readonly ILog _log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         #endregion
         #region CONSTRUCTOR
         public Message(string host, string user, string pass, string canal, string llave)
@@ -29,7 +33,7 @@ namespace SendMessage
         }
         #endregion
         #region ARCHIVO ADJUNTO
-        public bool AdjuntoArchivo(List<string> ubicacion)
+        public Task<bool> AdjuntoArchivo(List<string> ubicacion)
         {
             bool resp = false;
             try {
@@ -49,13 +53,15 @@ namespace SendMessage
                     }
                     resp = true;
                 }
+                else
+                    _log.Info("No posee archivo adjunto ");
             }
             catch (Exception ex) {
+                _log.ErrorFormat($"Error en el formato del archivo adjunto {ex.StackTrace}");
                 resp = false;
             }
-
             GC.Collect(2,GCCollectionMode.Forced);
-            return resp;
+            return Task.FromResult(resp);
         }
         #endregion
         #region CUENAT MAIL
@@ -66,14 +72,17 @@ namespace SendMessage
              GC.Collect(2, GCCollectionMode.Forced);
         }
         #endregion
+        #region LIBERACION MEMORIA 
         public void Dispose()
         {
             file = null;
             GC.Collect(2, GCCollectionMode.Forced);
         }
+        #endregion
         #region CORREO
-        public bool Correo(string asunto, List<string> para, List<string> cc)
+        public Task<bool> Correo(string asunto, List<string> para, List<string> cc)
         {
+            bool resp = false;
             try
             {
                 var parametro = new ConnectionFactory
@@ -113,17 +122,22 @@ namespace SendMessage
                         _emailRequest.Clear();
                     }
                 }
+               
+                resp = true;
                 GC.Collect(2, GCCollectionMode.Forced);
-                return true;
+                _log.Info("Correo Enviado Correctamente desde el Nugget ");
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _log.ErrorFormat($"Formato del coreo no es el correto Nugget {ex.StackTrace}");
+                resp = false;
                 GC.Collect(2, GCCollectionMode.Forced);
-                return false;
             }
+            return Task.FromResult(resp);
         }
         #endregion
-        public bool ParametrosDinamicos(object parametros)
+        #region PARAMETROS DINAMICOS
+        public Task<bool> ParametrosDinamicos(object parametros)
         {
             bool resp=false;
             try
@@ -131,14 +145,16 @@ namespace SendMessage
             if (parametros !=null) {
                 this.parametros = JsonConvert.SerializeObject(parametros);
                     resp = true;
+                    _log.Info("Parametros dinamicos correctamente!!  ");
             }
             } catch (Exception ex) {
+                _log.Error($"Error en los parametros dinamico {ex}");
                 resp = false;
             }
             GC.Collect(2, GCCollectionMode.Forced);
-            return resp;
+            return Task.FromResult(resp);
             
         }
-
+        #endregion
     }
 }
