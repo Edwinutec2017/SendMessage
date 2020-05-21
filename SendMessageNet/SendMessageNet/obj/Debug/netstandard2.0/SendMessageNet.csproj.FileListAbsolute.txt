@@ -1,0 +1,6 @@
+E:\Repo\SendMessage\SendMessageNet\SendMessageNet\bin\Debug\netstandard2.0\SendMessageNet.deps.json
+E:\Repo\SendMessage\SendMessageNet\SendMessageNet\bin\Debug\netstandard2.0\SendMessageNet.dll
+E:\Repo\SendMessage\SendMessageNet\SendMessageNet\obj\Debug\netstandard2.0\SendMessageNet.csprojAssemblyReference.cache
+E:\Repo\SendMessage\SendMessageNet\SendMessageNet\obj\Debug\netstandard2.0\SendMessageNet.csproj.CoreCompileInputs.cache
+E:\Repo\SendMessage\SendMessageNet\SendMessageNet\obj\Debug\netstandard2.0\SendMessageNet.AssemblyInfoInputs.cache
+E:\Repo\SendMessage\SendMessageNet\SendMessageNet\obj\Debug\netstandard2.0\SendMessageNet.AssemblyInfo.cs

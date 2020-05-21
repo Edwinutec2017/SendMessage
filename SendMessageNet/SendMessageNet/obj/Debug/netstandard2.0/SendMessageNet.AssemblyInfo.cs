@@ -11,13 +11,13 @@
 using System;
 using System.Reflection;
 
-[assembly: System.Reflection.AssemblyCompanyAttribute("Edwin")]
-[assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
-[assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.6")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.8")]
-[assembly: System.Reflection.AssemblyProductAttribute("SendMessage")]
-[assembly: System.Reflection.AssemblyTitleAttribute("SendMessage")]
-[assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.6")]
+[assembly: System.Reflection.AssemblyCompanyAttribute("SendMessageNet")]
+[assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
+[assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyProductAttribute("SendMessageNet")]
+[assembly: System.Reflection.AssemblyTitleAttribute("SendMessageNet")]
+[assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
 
 // Generado por la clase WriteCodeFragment de MSBuild.
 
