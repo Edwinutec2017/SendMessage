@@ -85,6 +85,9 @@ namespace SendMessage
             bool resp = false;
             try
             {
+                var cantidadNotificar = para.Count + cc.Count;
+                _log.Info($"Total Notificaciones {cantidadNotificar}");
+
                 var parametro = new ConnectionFactory
                 {
                     HostName = hostName,
@@ -125,7 +128,7 @@ namespace SendMessage
                
                 resp = true;
                 GC.Collect(2, GCCollectionMode.Forced);
-                _log.Info("Correo Enviado Correctamente desde el Nugget ");
+                _log.Info("Correo Enviados a Rabbit desde Nugets ");
             }
             catch (Exception ex)
             {
