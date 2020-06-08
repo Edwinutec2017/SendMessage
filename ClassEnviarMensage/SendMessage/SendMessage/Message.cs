@@ -33,7 +33,7 @@ namespace SendMessage
         }
         #endregion
         #region ARCHIVO ADJUNTO
-        public Task<bool> AdjuntoArchivo(List<string> ubicacion=null)
+        public Task<bool> AdjuntoArchivo(List<string> ubicacion)
         {
             bool resp = false;
             try {
