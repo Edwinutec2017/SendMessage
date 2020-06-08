@@ -10,9 +10,9 @@ C:\Users\bscenolasc\source\repos\SendMessage\SendMessage\obj\Release\netcoreapp2
 E:\Repo\SendMessage\ClassEnviarMensage\SendMessage\SendMessage\bin\Release\netcoreapp2.2\SendMessage.deps.json
 E:\Repo\SendMessage\ClassEnviarMensage\SendMessage\SendMessage\bin\Release\netcoreapp2.2\SendMessage.dll
 E:\Repo\SendMessage\ClassEnviarMensage\SendMessage\SendMessage\bin\Release\netcoreapp2.2\SendMessage.pdb
-E:\Repo\SendMessage\ClassEnviarMensage\SendMessage\SendMessage\obj\Release\netcoreapp2.2\SendMessage.csprojAssemblyReference.cache
 E:\Repo\SendMessage\ClassEnviarMensage\SendMessage\SendMessage\obj\Release\netcoreapp2.2\SendMessage.csproj.CoreCompileInputs.cache
 E:\Repo\SendMessage\ClassEnviarMensage\SendMessage\SendMessage\obj\Release\netcoreapp2.2\SendMessage.AssemblyInfoInputs.cache
 E:\Repo\SendMessage\ClassEnviarMensage\SendMessage\SendMessage\obj\Release\netcoreapp2.2\SendMessage.AssemblyInfo.cs
 E:\Repo\SendMessage\ClassEnviarMensage\SendMessage\SendMessage\obj\Release\netcoreapp2.2\SendMessage.dll
 E:\Repo\SendMessage\ClassEnviarMensage\SendMessage\SendMessage\obj\Release\netcoreapp2.2\SendMessage.pdb
+E:\Repo\SendMessage\ClassEnviarMensage\SendMessage\SendMessage\obj\Release\netcoreapp2.2\SendMessage.csprojAssemblyReference.cache

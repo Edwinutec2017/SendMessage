@@ -33,28 +33,34 @@ namespace SendMessage
         }
         #endregion
         #region ARCHIVO ADJUNTO
-        public Task<bool> AdjuntoArchivo(List<string> ubicacion)
+        public Task<bool> AdjuntoArchivo(List<string> ubicacion=null)
         {
             bool resp = false;
             try {
                 base64 = new List<Base64FileRequest>();
-                if (ubicacion.Count > 0)
-                {
-                    foreach (string ruta in ubicacion)
-                    {
-                        name = Path.GetFileName(ruta);
-                        file = Convert.ToBase64String(File.ReadAllBytes(ruta));
 
-                        base64.Add(new Base64FileRequest()
+                if (ubicacion!=null) {
+                    if (ubicacion.Count > 0)
+                    {
+                        foreach (string ruta in ubicacion)
                         {
-                            FileName = name,
-                            Base64Data = file
-                        });
+                            name = Path.GetFileName(ruta);
+                            file = Convert.ToBase64String(File.ReadAllBytes(ruta));
+
+                            base64.Add(new Base64FileRequest()
+                            {
+                                FileName = name,
+                                Base64Data = file
+                            });
+                        }
+                        resp = true;
                     }
-                    resp = true;
-                }
-                else
+                    else
+                        _log.Info("No existe ninguna direccion");
+
+                }else
                     _log.Info("No posee archivo adjunto ");
+
             }
             catch (Exception ex) {
                 _log.ErrorFormat($"Error en el formato del archivo adjunto {ex.StackTrace}");
@@ -132,7 +138,7 @@ namespace SendMessage
             }
             catch (Exception ex)
             {
-                _log.ErrorFormat($"Formato del coreo no es el correto Nugget {ex.StackTrace}");
+                _log.ErrorFormat($"Formato del coreo no es el correcto Nugget {ex.StackTrace}");
                 resp = false;
                 GC.Collect(2, GCCollectionMode.Forced);
             }
