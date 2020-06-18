@@ -44,14 +44,17 @@ namespace SendMessage
                     {
                         foreach (string ruta in ubicacion)
                         {
-                            name = Path.GetFileName(ruta);
-                            file = Convert.ToBase64String(File.ReadAllBytes(ruta));
+                            if (ruta != null && ruta !="") {
+                                name = Path.GetFileName(ruta);
+                                file = Convert.ToBase64String(File.ReadAllBytes(ruta));
 
-                            base64.Add(new Base64FileRequest()
-                            {
-                                FileName = name,
-                                Base64Data = file
-                            });
+                                base64.Add(new Base64FileRequest()
+                                {
+                                    FileName = name,
+                                    Base64Data = file
+                                });
+                            }
+
                         }
                         resp = true;
                     }
@@ -64,6 +67,8 @@ namespace SendMessage
             }
             catch (Exception ex) {
                 _log.ErrorFormat($"Error en el formato del archivo adjunto {ex.StackTrace}");
+                _log.Warn("O error de conexion a Rabbit " +
+                    "");
                 resp = false;
             }
             GC.Collect(2,GCCollectionMode.Forced);
@@ -91,9 +96,8 @@ namespace SendMessage
             bool resp = false;
             try
             {
-                var cantidadNotificar = para.Count + cc.Count;
-                _log.Info($"Total Notificaciones {cantidadNotificar}");
 
+                _log.Info("Iniciando Porceso de envio correo a Rabbti");
                 var parametro = new ConnectionFactory
                 {
                     HostName = hostName,
@@ -134,11 +138,11 @@ namespace SendMessage
                
                 resp = true;
                 GC.Collect(2, GCCollectionMode.Forced);
-                _log.Info("Correo Enviados a Rabbit desde Nugets ");
+                _log.Info("Correo Enviados a Rabbit");
             }
             catch (Exception ex)
             {
-                _log.ErrorFormat($"Formato del coreo no es el correcto Nugget {ex.StackTrace}");
+                _log.ErrorFormat($"Formato del correo no es el correcto {ex.StackTrace}");
                 resp = false;
                 GC.Collect(2, GCCollectionMode.Forced);
             }
