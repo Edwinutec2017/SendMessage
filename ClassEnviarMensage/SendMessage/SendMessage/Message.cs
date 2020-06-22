@@ -67,8 +67,7 @@ namespace SendMessage
             }
             catch (Exception ex) {
                 _log.ErrorFormat($"Error en el formato del archivo adjunto {ex.StackTrace}");
-                _log.Warn("O error de conexion a Rabbit " +
-                    "");
+                _log.Warn("O error de conexion a Rabbit ");
                 resp = false;
             }
             GC.Collect(2,GCCollectionMode.Forced);
