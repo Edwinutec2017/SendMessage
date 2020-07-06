@@ -30,6 +30,7 @@ namespace SendMessage
             this.pass = pass;
             this.canal = canal;
             this.llave = llave;
+
         }
         #endregion
         #region ARCHIVO ADJUNTO
@@ -96,7 +97,7 @@ namespace SendMessage
             try
             {
 
-                _log.Info("Iniciando Porceso de envio correo a Rabbti");
+                _log.Info("Iniciando Proceso de envio correo a Rabbti");
                 var parametro = new ConnectionFactory
                 {
                     HostName = hostName,
