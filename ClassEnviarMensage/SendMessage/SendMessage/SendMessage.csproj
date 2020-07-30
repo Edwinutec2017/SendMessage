@@ -4,13 +4,15 @@
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <ApplicationIcon />
     <Win32Resource />
-    <Authors>Edwin</Authors>
+    <Authors>Edwin Nolasco</Authors>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <AssemblyVersion>1.0.0.6</AssemblyVersion>
     <FileVersion>1.0.0.6</FileVersion>
-    <Version>1.0.12</Version>
-    <Description>Actualizacion de Rabbit a 6.1.0</Description>
+    <Version>1.0.13</Version>
+    <Description>Creado para mandar Mail A RabbitMQ</Description>
+    <PackageReleaseNotes>Derechos de autor Reservados</PackageReleaseNotes>
+    <Company>Edwin Nolasco</Company>
   </PropertyGroup>
 
   <ItemGroup>

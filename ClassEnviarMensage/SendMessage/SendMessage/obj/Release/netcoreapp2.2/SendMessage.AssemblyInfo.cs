@@ -11,11 +11,11 @@
 using System;
 using System.Reflection;
 
-[assembly: System.Reflection.AssemblyCompanyAttribute("Edwin")]
+[assembly: System.Reflection.AssemblyCompanyAttribute("Edwin Nolasco")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
-[assembly: System.Reflection.AssemblyDescriptionAttribute("Actualizacion de Rabbit a 6.1.0")]
+[assembly: System.Reflection.AssemblyDescriptionAttribute("Creado para mandar Mail A RabbitMQ")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.6")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.12")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.13")]
 [assembly: System.Reflection.AssemblyProductAttribute("SendMessage")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SendMessage")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.6")]

@@ -1,6 +1,7 @@
 ﻿using log4net;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
+using SendMessage.Class;
 using SendMessage.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -18,19 +19,15 @@ namespace SendMessage
         private string parametros = null;
         private string name = null;
         private string file = null;
-        private string hostName, user, pass, cuenta, de, canal, llave;
+        private  ParametersMessage parametersMessage;
+        private  CuentaEmail cuentaEmail;
         private List<Base64FileRequest> base64 = null;
         private static readonly ILog _log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         #endregion
         #region CONSTRUCTOR
-        public Message(string host, string user, string pass, string canal, string llave)
+        public Message(ParametersMessage _parametersMessage )
         {
-            this.hostName = host;
-            this.user = user;
-            this.pass = pass;
-            this.canal = canal;
-            this.llave = llave;
-
+            parametersMessage = _parametersMessage;
         }
         #endregion
         #region ARCHIVO ADJUNTO
@@ -68,19 +65,18 @@ namespace SendMessage
             }
             catch (Exception ex) {
                 _log.ErrorFormat($"Error en el formato del archivo adjunto {ex.StackTrace}");
-                _log.Warn("O error de conexion a Rabbit ");
+               
                 resp = false;
             }
-            GC.Collect(2,GCCollectionMode.Forced);
+            Dispose();
             return Task.FromResult(resp);
         }
         #endregion
         #region CUENAT MAIL
-        public void CuentaEmail(string cuenta, string de)
+        public void CuentaEmail(CuentaEmail _cuentaEmail)
         {
-            this.cuenta = cuenta;
-            this.de = de;
-             GC.Collect(2, GCCollectionMode.Forced);
+            cuentaEmail = _cuentaEmail;
+             Dispose();
         }
         #endregion
         #region LIBERACION MEMORIA 
@@ -91,33 +87,34 @@ namespace SendMessage
         }
         #endregion
         #region CORREO
-        public Task<bool> Correo(string asunto, List<string> para, List<string> cc)
+        public Task<bool> Correo(ComplementEmail _complementEmail)
         {
             bool resp = false;
             try
             {
-
-                _log.Info("Iniciando Proceso de envio correo a Rabbti");
+                _log.Info("Iniciando Proceso de envio correo a RabbitMQ");
                 var parametro = new ConnectionFactory
                 {
-                    HostName = hostName,
+                    HostName = parametersMessage.Host,
                     Port = AmqpTcpEndpoint.UseDefaultPort,
-                    UserName = user,
-                    Password = pass
+                    UserName = parametersMessage.UserRabbitMQ,
+                    Password = parametersMessage.Password
                 };
                 using (var connection = parametro.CreateConnection())
                 {
+                    _log.Info("Conexion Exitosa a RabbitMQ !");
                     using (var canales = connection.CreateModel())
                     {
+                        
                         var _emailRequest = new List<EmailRequest>()
                         {
                             new EmailRequest()
                             {
-                                CuentaMail=cuenta,
-                                De= de,
-                                Para=para,
-                                CC=cc,
-                                Asunto=asunto,
+                                CuentaMail=cuentaEmail.CuentaId,
+                                De= cuentaEmail.EnviaMail,
+                                Para=_complementEmail.Para,
+                                CC=_complementEmail.CopiaMail,
+                                Asunto=_complementEmail.Asunto,
                                 ParametrosDinamicos=parametros,
                                 Base64Files= base64
 
@@ -127,8 +124,8 @@ namespace SendMessage
                         properties.DeliveryMode = 2;
                         canales.ConfirmSelect();
                         canales.BasicPublish(
-                        exchange: canal,
-                        routingKey: llave,
+                        exchange: parametersMessage.Channel,
+                        routingKey: parametersMessage.Key,
                         basicProperties: properties,
                         body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(_emailRequest)));
                         canales.WaitForConfirmsOrDie();
@@ -137,15 +134,15 @@ namespace SendMessage
                 }
                
                 resp = true;
-                GC.Collect(2, GCCollectionMode.Forced);
-                _log.Info("Correo Enviados a Rabbit");
+                _log.Info("Correo Enviados a RabbitMQ");
             }
             catch (Exception ex)
             {
-                _log.ErrorFormat($"Formato del correo no es el correcto {ex.StackTrace}");
+                _log.Warn($"Error de Conexion Revise las Credenciales!! {ex.StackTrace}");
                 resp = false;
-                GC.Collect(2, GCCollectionMode.Forced);
+              
             }
+            Dispose();
             return Task.FromResult(resp);
         }
         #endregion
@@ -164,7 +161,7 @@ namespace SendMessage
                 _log.Error($"Error en los parametros dinamico {ex}");
                 resp = false;
             }
-            GC.Collect(2, GCCollectionMode.Forced);
+            Dispose();
             return Task.FromResult(resp);
             
         }
