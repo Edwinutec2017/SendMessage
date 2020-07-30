@@ -25,9 +25,10 @@ namespace SendMessage
         private static readonly ILog _log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         #endregion
         #region CONSTRUCTOR
-        public Message(ParametersMessage _parametersMessage )
+        public Message(ParametersMessage _parametersMessage, CuentaEmail _cuentaEmail)
         {
             parametersMessage = _parametersMessage;
+            cuentaEmail = _cuentaEmail;
         }
         #endregion
         #region ARCHIVO ADJUNTO
@@ -70,13 +71,6 @@ namespace SendMessage
             }
             Dispose();
             return Task.FromResult(resp);
-        }
-        #endregion
-        #region CUENAT MAIL
-        public void CuentaEmail(CuentaEmail _cuentaEmail)
-        {
-            cuentaEmail = _cuentaEmail;
-             Dispose();
         }
         #endregion
         #region LIBERACION MEMORIA 

@@ -9,7 +9,6 @@ namespace SendMessage.Interfaces
    public interface IMessage
     {
         Task<bool> AdjuntoArchivo(List<string> ubicacion);
-        void CuentaEmail(CuentaEmail _cuentaEmail);
         Task<bool> ParametrosDinamicos(object parametros);
         Task<bool> Correo(ComplementEmail _complementEmail);
     }

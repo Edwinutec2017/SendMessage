@@ -16,8 +16,6 @@ namespace SendMessage.Interfaces
         public string RutaArchivo { get; set; }
         public List<Base64FileRequest> Base64Files { get; set; }
         public dynamic ParametrosDinamicos { get; set; }
-
-    
         #endregion
     }
     public class Base64FileRequest
