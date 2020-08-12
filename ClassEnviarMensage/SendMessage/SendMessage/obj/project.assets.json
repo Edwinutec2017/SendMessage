@@ -5382,7 +5382,7 @@
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
-    "version": "1.0.13",
+    "version": "1.0.14",
     "restore": {
       "projectUniqueName": "E:\\Repo\\SendMessage\\ClassEnviarMensage\\SendMessage\\SendMessage\\SendMessage.csproj",
       "projectName": "SendMessage",

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SendMessage.Interfaces
 {
-   public interface IMessage
+   public interface IMessage:IDisposable
     {
         Task<bool> AdjuntoArchivo(List<string> ubicacion);
         Task<bool> ParametrosDinamicos(object parametros);

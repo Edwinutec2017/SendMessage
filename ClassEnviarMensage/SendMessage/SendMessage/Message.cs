@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace SendMessage
 {
-   public class Message: IMessage,IDisposable
+   public class Message: IMessage
     {
         #region ATRIBUTOS
         private string parametros = null;
@@ -24,15 +24,18 @@ namespace SendMessage
         private List<Base64FileRequest> base64 = null;
         private static readonly ILog _log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         #endregion
+
         #region CONSTRUCTOR
+
         public Message(ParametersMessage _parametersMessage, CuentaEmail _cuentaEmail)
         {
             parametersMessage = _parametersMessage;
             cuentaEmail = _cuentaEmail;
         }
         #endregion
+
         #region ARCHIVO ADJUNTO
-        public Task<bool> AdjuntoArchivo(List<string> ubicacion)
+        public async Task<bool> AdjuntoArchivo(List<string> ubicacion)
         {
             bool resp = false;
             try {
@@ -70,18 +73,27 @@ namespace SendMessage
                 resp = false;
             }
             Dispose();
-            return Task.FromResult(resp);
+            return await Task.FromResult(resp);
         }
         #endregion
+
         #region LIBERACION MEMORIA 
+        private  void ClearVariables() {
+            parametros = null;
+            name = null;
+            file = null;
+        }
+
         public void Dispose()
         {
-            file = null;
+            ClearVariables();
+            GCSettings.LargeObjectHeapCompactionMode = GCLargeObjectHeapCompactionMode.CompactOnce;
             GC.Collect(2, GCCollectionMode.Forced);
         }
         #endregion
+
         #region CORREO
-        public Task<bool> Correo(ComplementEmail _complementEmail)
+        public async Task<bool> Correo(ComplementEmail _complementEmail)
         {
             bool resp = false;
             try
@@ -124,6 +136,7 @@ namespace SendMessage
                         body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(_emailRequest)));
                         canales.WaitForConfirmsOrDie();
                         _emailRequest.Clear();
+                        canales.Close();
                     }
                 }
                
@@ -137,11 +150,12 @@ namespace SendMessage
               
             }
             Dispose();
-            return Task.FromResult(resp);
+            return await Task.FromResult(resp);
         }
         #endregion
+
         #region PARAMETROS DINAMICOS
-        public Task<bool> ParametrosDinamicos(object parametros)
+        public async Task<bool> ParametrosDinamicos(object parametros)
         {
             bool resp=false;
             try
@@ -156,7 +170,7 @@ namespace SendMessage
                 resp = false;
             }
             Dispose();
-            return Task.FromResult(resp);
+            return await Task.FromResult(resp);
             
         }
         #endregion
