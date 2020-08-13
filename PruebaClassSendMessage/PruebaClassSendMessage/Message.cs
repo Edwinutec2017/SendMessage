@@ -1,11 +1,16 @@
 ﻿using log4net;
 using Newtonsoft.Json;
+using Polly;
+using Polly.Retry;
 using RabbitMQ.Client;
+using RabbitMQ.Client.Exceptions;
 using SendMessage.Class;
 using SendMessage.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Net.Sockets;
 using System.Reflection;
 using System.Runtime;
 using System.Text;
@@ -24,6 +29,7 @@ namespace SendMessage
         private List<Base64FileRequest> base64 = null;
         private static int contador;
         private static int _retryCount;
+        object sync_root = new object();
         private static readonly ILog _log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         #endregion
 
@@ -100,26 +106,47 @@ namespace SendMessage
         public async Task<bool> Correo(ComplementEmail _complementEmail)
         {
             bool resp = false;
-            try
-            {
-                _log.Info("Iniciando Proceso de envio correo a RabbitMQ");
-                var parametro = new ConnectionFactory
-                {
-                    HostName = parametersMessage.Host,
-                    Port = AmqpTcpEndpoint.UseDefaultPort,
-                    UserName = parametersMessage.UserRabbitMQ,
-                    Password = parametersMessage.Password
-                };
-                using (var connection = parametro.CreateConnection())
-                {
-                    _log.Info("Conexion Exitosa a RabbitMQ !");
-                    using (var canales = connection.CreateModel())
+
+
+            try {
+
+  
+                    var policy = RetryPolicy.Handle<Exception>()
+                        .Or<BrokerUnreachableException>()
+                             .WaitAndRetry(_retryCount, retryAttempt => TimeSpan.FromSeconds(Math.Pow(1, retryAttempt)), (ex, time) =>
+                             {
+                                 contador++;
+                                 if (_retryCount.Equals(contador))
+                                 {
+                                     Console.WriteLine($"Intentos de Conexion a Rabit{_retryCount}");
+                                     contador = 0;
+                                 }
+                                 else
+                                     Console.WriteLine($"intentos {contador}");
+
+
+                             });
+
+                    policy.Execute(() =>
                     {
-                        
-                        var _emailRequest = new List<EmailRequest>()
+                        _log.Info("Iniciando Proceso de envio correo a RabbitMQ");
+                        var parametro = new ConnectionFactory
                         {
-                            new EmailRequest()
+                            HostName = parametersMessage.Host,
+                            Port = AmqpTcpEndpoint.UseDefaultPort,
+                            UserName = parametersMessage.UserRabbitMQ,
+                            Password = parametersMessage.Password
+                        };
+                        using (var connection = parametro.CreateConnection())
+                        {
+                            _log.Info("Conexion Exitosa a RabbitMQ !");
+                            using (var canales = connection.CreateModel())
                             {
+
+                                var _emailRequest = new List<EmailRequest>()
+                                    {
+                                    new EmailRequest()
+                                    {
                                 CuentaMail=cuentaEmail.CuentaId,
                                 De= cuentaEmail.EnviaMail,
                                 Para=_complementEmail.Para,
@@ -128,36 +155,36 @@ namespace SendMessage
                                 ParametrosDinamicos=parametros,
                                 Base64Files= base64
 
+                                    }
+                                     };
+                                var properties = canales.CreateBasicProperties();
+                                properties.DeliveryMode = 2;
+                                canales.ConfirmSelect();
+                                canales.BasicPublish(
+                                exchange: parametersMessage.Channel,
+                                routingKey: parametersMessage.Key,
+                                basicProperties: properties,
+                                body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(_emailRequest)));
+                                canales.WaitForConfirmsOrDie();
+                                _emailRequest.Clear();
+                                canales.Close();
                             }
-                        };
-                        var properties = canales.CreateBasicProperties();
-                        properties.DeliveryMode = 2;
-                        canales.ConfirmSelect();
-                        canales.BasicPublish(
-                        exchange: parametersMessage.Channel,
-                        routingKey: parametersMessage.Key,
-                        basicProperties: properties,
-                        body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(_emailRequest)));
-                        canales.WaitForConfirmsOrDie();
-                        _emailRequest.Clear();
-                        canales.Close();
-                    }
-                }
-               
+                          
+                        }
+                    });
+                
                 resp = true;
-                _log.Info("Correo Enviados a RabbitMQ");
+
             }
-            catch (Exception ex)
-            {
-                _log.Warn($"Error de Conexion Revise las Credenciales!! {ex.StackTrace}");
-                resp = false;
-              
+            catch (Exception ex) {
+
             }
+
+
             Dispose();
             return await Task.FromResult(resp);
         }
         #endregion
-
         #region PARAMETROS DINAMICOS
         public async Task<bool> ParametrosDinamicos(object parametros)
         {

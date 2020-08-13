@@ -1,0 +1,11 @@
+C:\Users\alex\source\repos\PruebaClassSendMessage\PruebaClassSendMessage\bin\Debug\netcoreapp2.2\PruebaClassSendMessage.deps.json
+C:\Users\alex\source\repos\PruebaClassSendMessage\PruebaClassSendMessage\bin\Debug\netcoreapp2.2\PruebaClassSendMessage.runtimeconfig.json
+C:\Users\alex\source\repos\PruebaClassSendMessage\PruebaClassSendMessage\bin\Debug\netcoreapp2.2\PruebaClassSendMessage.runtimeconfig.dev.json
+C:\Users\alex\source\repos\PruebaClassSendMessage\PruebaClassSendMessage\bin\Debug\netcoreapp2.2\PruebaClassSendMessage.dll
+C:\Users\alex\source\repos\PruebaClassSendMessage\PruebaClassSendMessage\obj\Debug\netcoreapp2.2\PruebaClassSendMessage.csprojAssemblyReference.cache
+C:\Users\alex\source\repos\PruebaClassSendMessage\PruebaClassSendMessage\obj\Debug\netcoreapp2.2\PruebaClassSendMessage.csproj.CoreCompileInputs.cache
+C:\Users\alex\source\repos\PruebaClassSendMessage\PruebaClassSendMessage\obj\Debug\netcoreapp2.2\PruebaClassSendMessage.AssemblyInfoInputs.cache
+C:\Users\alex\source\repos\PruebaClassSendMessage\PruebaClassSendMessage\obj\Debug\netcoreapp2.2\PruebaClassSendMessage.AssemblyInfo.cs
+C:\Users\alex\source\repos\PruebaClassSendMessage\PruebaClassSendMessage\bin\Debug\netcoreapp2.2\PruebaClassSendMessage.pdb
+C:\Users\alex\source\repos\PruebaClassSendMessage\PruebaClassSendMessage\obj\Debug\netcoreapp2.2\PruebaClassSendMessage.dll
+C:\Users\alex\source\repos\PruebaClassSendMessage\PruebaClassSendMessage\obj\Debug\netcoreapp2.2\PruebaClassSendMessage.pdb
