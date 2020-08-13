@@ -28,6 +28,8 @@ namespace SendMessage
         private static int _retryCount;
         private IConnection _connection;
         private Fecha _fecha;
+        private static int _contador;
+        private static bool _resp;
         private static readonly ILog _log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         #endregion
 
@@ -38,6 +40,8 @@ namespace SendMessage
             cuentaEmail = _cuentaEmail;
             _retryCount = 4;
             _fecha = new Fecha();
+            _contador = 0;
+            _resp = false;
 
         }
         #endregion
@@ -45,43 +49,56 @@ namespace SendMessage
         #region ARCHIVO ADJUNTO
         public async Task<bool> AdjuntoArchivo(List<string> ubicacion)
         {
-            bool resp = false;
+
+            _resp = false;
+            _contador = 0;
+
             try {
-                base64 = new List<Base64FileRequest>();
 
-                if (ubicacion != null) {
-                    if (ubicacion.Count > 0)
+                var policyBase64 = RetryPolicy.Handle<Exception>().Or<NullReferenceException>().
+                    WaitAndRetry(_retryCount, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)), (ex, time) =>
                     {
-                        foreach (string ruta in ubicacion)
+                        _contador++;
+                        _log.Warn($"Intentos de poner el archivo adjunto {_contador} {_fecha.FechaNow().Result}");
+                    });
+
+                policyBase64.Execute(()=> {
+                    base64 = new List<Base64FileRequest>();
+                    if (ubicacion != null)
+                    {
+                        if (ubicacion.Count > 0)
                         {
-                            if (ruta != null && ruta != "") {
-                                name = Path.GetFileName(ruta);
-                                file = Convert.ToBase64String(File.ReadAllBytes(ruta));
-
-                                base64.Add(new Base64FileRequest()
+                            foreach (string ruta in ubicacion)
+                            {
+                                if (ruta != null && ruta != "")
                                 {
-                                    FileName = name,
-                                    Base64Data = file
-                                });
-                            }
+                                    name = Path.GetFileName(ruta);
+                                    file = Convert.ToBase64String(File.ReadAllBytes(ruta));
 
+                                    base64.Add(new Base64FileRequest()
+                                    {
+                                        FileName = name,
+                                        Base64Data = file
+                                    });
+                                }
+
+                            }
+                            _resp = true;
                         }
-                        resp = true;
                     }
                     else
-                        _log.Info("No existe ninguna direccion");
-
-                } else
-                    _log.Info("No posee archivo adjunto ");
+                        _log.Info($"No ay archivo adjunto en esta notificacion {_fecha.FechaNow().Result}");
+                });
 
             }
             catch (Exception ex) {
-                _log.ErrorFormat($"Error en el formato del archivo adjunto {ex.StackTrace}");
+                _log.Fatal($"Intentos para agregar el archivo adjunto {_contador} {_fecha.FechaNow().Result}");
+                _log.ErrorFormat($"Excepcion {ex.StackTrace} {_fecha.FechaNow().Result}");
 
-                resp = false;
+                _resp = false;
             }
             Dispose();
-            return await Task.FromResult(resp);
+            return await Task.FromResult(_resp);
         }
         #endregion
 
