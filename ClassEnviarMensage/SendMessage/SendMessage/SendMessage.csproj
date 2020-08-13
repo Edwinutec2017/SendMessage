@@ -9,8 +9,9 @@
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <AssemblyVersion>1.0.0.6</AssemblyVersion>
     <FileVersion>1.0.0.6</FileVersion>
-    <Version>1.0.14</Version>
-    <Description>Para Mandar colas A Rabbit</Description>
+    <Version>1.0.15</Version>
+    <Description>Para Mandar colas A Rabbit
+Con resilencia</Description>
     <PackageReleaseNotes>Derechos de autor Reservados</PackageReleaseNotes>
     <Company>Edwin Nolasco</Company>
   </PropertyGroup>

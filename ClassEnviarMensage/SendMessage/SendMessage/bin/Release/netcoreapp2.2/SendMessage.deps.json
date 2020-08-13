@@ -1,14 +1,15 @@
 {
   "runtimeTarget": {
     "name": ".NETCoreApp,Version=v2.2",
-    "signature": "dcc4649a35c0f13c070e9f5bded6e113492ef3c2"
+    "signature": "cac50d70b1e0671ef066e9f7551b4a1ee4999951"
   },
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v2.2": {
-      "SendMessage/1.0.14": {
+      "SendMessage/1.0.15": {
         "dependencies": {
           "Newtonsoft.Json": "12.0.3",
+          "Polly": "7.2.1",
           "RabbitMQ.Client": "6.1.0",
           "log4net": "2.0.8"
         },
@@ -83,6 +84,14 @@
           "lib/netstandard2.0/Newtonsoft.Json.dll": {
             "assemblyVersion": "12.0.0.0",
             "fileVersion": "12.0.3.23909"
+          }
+        }
+      },
+      "Polly/7.2.1": {
+        "runtime": {
+          "lib/netstandard2.0/Polly.dll": {
+            "assemblyVersion": "7.0.0.0",
+            "fileVersion": "7.2.1.0"
           }
         }
       },
@@ -896,7 +905,7 @@
     }
   },
   "libraries": {
-    "SendMessage/1.0.14": {
+    "SendMessage/1.0.15": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
@@ -928,6 +937,13 @@
       "sha512": "sha512-6mgjfnRB4jKMlzHSl+VD+oUc1IebOZabkbyWj2RiTgWwYPPuaK1H97G1sHqGwPlS5npiF5Q0OrxN1wni2n5QWg==",
       "path": "newtonsoft.json/12.0.3",
       "hashPath": "newtonsoft.json.12.0.3.nupkg.sha512"
+    },
+    "Polly/7.2.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-Od8SnPlpQr+PuAS0YzY3jgtzaDNknlIuAaldN2VEIyTvm/wCg22C5nUkUV1BEG8rIsub5RFMoV/NEQ0tM/+7Uw==",
+      "path": "polly/7.2.1",
+      "hashPath": "polly.7.2.1.nupkg.sha512"
     },
     "RabbitMQ.Client/6.1.0": {
       "type": "package",
