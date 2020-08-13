@@ -59,7 +59,7 @@ namespace SendMessage
                     WaitAndRetry(_retryCount, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)), (ex, time) =>
                     {
                         _contador++;
-                        _log.Warn($"Intentos de poner el archivo adjunto {_contador} {_fecha.FechaNow().Result}");
+                        _log.Warn($"Intento {_contador} para  poner el archivo adjunto {_contador} {_fecha.FechaNow().Result}");
                     });
 
                 policyBase64.Execute(()=> {
@@ -130,7 +130,7 @@ namespace SendMessage
                 .WaitAndRetry(_retryCount, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)), (ex, time) =>
                 {
                     contadorConexion++;
-                    _log.Warn($"Estableciendo conexion a RabbitMq.. {contadorConexion} !!!! {_fecha.FechaNow().Result}");
+                    _log.Warn($"Intento {contadorConexion} para establecer la conexion a RabbitMq..  !!!! {_fecha.FechaNow().Result}");
                 });
 
                 policyRabbit.Execute(() =>
@@ -143,7 +143,7 @@ namespace SendMessage
                         Password = parametersMessage.Password
                     };
                     _connection = parametro.CreateConnection();
-                    _log.Info($"Conexion a RabbitMq Existoso !!!!! {_fecha.FechaNow().Result}");
+                    _log.Info($"Conexion a RabbitMq  !!!!! {_fecha.FechaNow().Result}");
                     resp = true;
                 });
             }
@@ -168,7 +168,7 @@ namespace SendMessage
                        .WaitAndRetry(_retryCount, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)), (ex, time) =>
                            {
                            contador++;
-                               _log.Warn($"Intentos para poner mensage en cola en Rabbit {contador} -- {_fecha.FechaNow().Result}  ");
+                               _log.Warn($"Intento {contador} para poner mensage en cola en RabbitMq !!!  -- {_fecha.FechaNow().Result}  ");
                           });
 
                 if (Connection().Result)
@@ -213,7 +213,7 @@ namespace SendMessage
             catch (Exception ex)
             {
                 _log.Fatal($"Total de intentos para ponder en cola el mensage {contador} {_fecha.FechaNow().Result}");
-                _log.Warn($"No se pudo poner el mensage en cola de RabbitMq {ex.StackTrace} {_fecha.FechaNow().Result}");
+                _log.Warn($"Excepcion {ex.StackTrace} {_fecha.FechaNow().Result}");
                 resp = false;
             }
             Dispose();
