@@ -1,6 +1,9 @@
 ﻿using log4net;
 using Newtonsoft.Json;
+using Polly;
+using Polly.Retry;
 using RabbitMQ.Client;
+using RabbitMQ.Client.Exceptions;
 using SendMessage.Class;
 using SendMessage.Interfaces;
 using System;
@@ -13,28 +16,27 @@ using System.Threading.Tasks;
 
 namespace SendMessage
 {
-   public class Message: IMessage
+    public class Message : IMessage
     {
         #region ATRIBUTOS
         private string parametros = null;
         private string name = null;
         private string file = null;
-        private  ParametersMessage parametersMessage;
-        private  CuentaEmail cuentaEmail;
+        private ParametersMessage parametersMessage;
+        private CuentaEmail cuentaEmail;
         private List<Base64FileRequest> base64 = null;
-        private static int contador;
         private static int _retryCount;
+        private IConnection _connection;
         private static readonly ILog _log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         #endregion
 
         #region CONSTRUCTOR
-
         public Message(ParametersMessage _parametersMessage, CuentaEmail _cuentaEmail)
         {
             parametersMessage = _parametersMessage;
             cuentaEmail = _cuentaEmail;
             _retryCount = 5;
-            contador = 0;
+
         }
         #endregion
 
@@ -45,12 +47,12 @@ namespace SendMessage
             try {
                 base64 = new List<Base64FileRequest>();
 
-                if (ubicacion!=null) {
+                if (ubicacion != null) {
                     if (ubicacion.Count > 0)
                     {
                         foreach (string ruta in ubicacion)
                         {
-                            if (ruta != null && ruta !="") {
+                            if (ruta != null && ruta != "") {
                                 name = Path.GetFileName(ruta);
                                 file = Convert.ToBase64String(File.ReadAllBytes(ruta));
 
@@ -67,13 +69,13 @@ namespace SendMessage
                     else
                         _log.Info("No existe ninguna direccion");
 
-                }else
+                } else
                     _log.Info("No posee archivo adjunto ");
 
             }
             catch (Exception ex) {
                 _log.ErrorFormat($"Error en el formato del archivo adjunto {ex.StackTrace}");
-               
+
                 resp = false;
             }
             Dispose();
@@ -86,8 +88,8 @@ namespace SendMessage
             parametros = null;
             name = null;
             file = null;
-        }
 
+        }
         public void Dispose()
         {
             ClearVariables();
@@ -97,26 +99,64 @@ namespace SendMessage
         #endregion
 
         #region CORREO
+        #region VALIDAR CONECION A RABBITMQ
+        private Task<bool> Connection() {
+            bool resp = false;
+            int contadorConexion = 0;
+            try
+            {
+                var policyRabbit = RetryPolicy.Handle<Exception>()
+                .Or<BrokerUnreachableException>()
+                .WaitAndRetry(_retryCount, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)), (ex, time) =>
+                {
+                    contadorConexion++;
+                    _log.Warn($"Reintento de conexion a RabbitMq.. {contadorConexion}");
+                });
+
+                policyRabbit.Execute(() =>
+                {
+                    var parametro = new ConnectionFactory
+                    {
+                        HostName = parametersMessage.Host,
+                        Port = AmqpTcpEndpoint.UseDefaultPort,
+                        UserName = parametersMessage.UserRabbitMQ,
+                        Password = parametersMessage.Password
+                    };
+                    _connection = parametro.CreateConnection();
+                    _log.Info($"Conexion a RabbitMq Existoso host :{parametersMessage.Host}");
+                    resp = true;
+                });
+            }
+            catch (Exception ex) {
+
+                _log.Fatal($"No se logro establecer conexiona RabbitMq total de Intestos {contadorConexion}....{ex.StackTrace}");
+            }
+            return Task.FromResult(resp);
+
+        }
+        #endregion
+
         public async Task<bool> Correo(ComplementEmail _complementEmail)
         {
             bool resp = false;
+            int contador = 0;
             try
             {
-                _log.Info("Iniciando Proceso de envio correo a RabbitMQ");
-                var parametro = new ConnectionFactory
+                var policy = RetryPolicy.Handle<Exception>()
+                           .Or<BrokerUnreachableException>()
+                       .WaitAndRetry(_retryCount, retryAttempt => TimeSpan.FromSeconds(Math.Pow(1, retryAttempt)), (ex, time) =>
+                           {
+                           contador++;
+                               _log.Warn($"Intestos para poner mensage en cola en Rabbit {contador}");
+                          });
+
+                if (Connection().Result)
                 {
-                    HostName = parametersMessage.Host,
-                    Port = AmqpTcpEndpoint.UseDefaultPort,
-                    UserName = parametersMessage.UserRabbitMQ,
-                    Password = parametersMessage.Password
-                };
-                using (var connection = parametro.CreateConnection())
-                {
-                    _log.Info("Conexion Exitosa a RabbitMQ !");
-                    using (var canales = connection.CreateModel())
-                    {
-                        
-                        var _emailRequest = new List<EmailRequest>()
+                    policy.Execute(() => {
+                        _log.Info("Iniciando Proceso de poner en cola en RabbitMQ");
+                        using (var canales = _connection.CreateModel())
+                        {
+                            var _emailRequest = new List<EmailRequest>()
                         {
                             new EmailRequest()
                             {
@@ -130,28 +170,28 @@ namespace SendMessage
 
                             }
                         };
-                        var properties = canales.CreateBasicProperties();
-                        properties.DeliveryMode = 2;
-                        canales.ConfirmSelect();
-                        canales.BasicPublish(
-                        exchange: parametersMessage.Channel,
-                        routingKey: parametersMessage.Key,
-                        basicProperties: properties,
-                        body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(_emailRequest)));
-                        canales.WaitForConfirmsOrDie();
-                        _emailRequest.Clear();
-                        canales.Close();
-                    }
+                            var properties = canales.CreateBasicProperties();
+                            properties.DeliveryMode = 2;
+                            canales.ConfirmSelect();
+                            canales.BasicPublish(
+                            exchange: parametersMessage.Channel,
+                            routingKey: parametersMessage.Key,
+                            basicProperties: properties,
+                            body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(_emailRequest)));
+                            canales.WaitForConfirmsOrDie();
+                            _emailRequest.Clear();
+                            canales.Close();
+                        }
+                        resp = true;
+                    });
                 }
-               
-                resp = true;
-                _log.Info("Correo Enviados a RabbitMQ");
+
             }
             catch (Exception ex)
             {
-                _log.Warn($"Error de Conexion Revise las Credenciales!! {ex.StackTrace}");
+                _log.Fatal($"Total de intestos para ponder en cola en mensage {contador}");
+                _log.Warn($"No se pudo poner el mensage en cola de RabbitMq {ex.StackTrace}");
                 resp = false;
-              
             }
             Dispose();
             return await Task.FromResult(resp);
