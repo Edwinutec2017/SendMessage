@@ -6,7 +6,7 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v2.2": {
-      "SendMessage/1.0.16": {
+      "SendMessage/1.0.17": {
         "dependencies": {
           "Newtonsoft.Json": "12.0.3",
           "Polly": "7.2.1",
@@ -905,7 +905,7 @@
     }
   },
   "libraries": {
-    "SendMessage/1.0.16": {
+    "SendMessage/1.0.17": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

@@ -15,3 +15,4 @@ E:\Repo\SendMessage\ClassEnviarMensage\SendMessage\SendMessage\obj\Release\netco
 E:\Repo\SendMessage\ClassEnviarMensage\SendMessage\SendMessage\obj\Release\netcoreapp2.2\SendMessage.AssemblyInfo.cs
 E:\Repo\SendMessage\ClassEnviarMensage\SendMessage\SendMessage\obj\Release\netcoreapp2.2\SendMessage.dll
 E:\Repo\SendMessage\ClassEnviarMensage\SendMessage\SendMessage\obj\Release\netcoreapp2.2\SendMessage.pdb
+E:\Repo\SendMessage\ClassEnviarMensage\SendMessage\SendMessage\obj\Release\netcoreapp2.2\SendMessage.csprojAssemblyReference.cache

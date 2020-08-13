@@ -126,13 +126,13 @@ namespace SendMessage
                         Password = parametersMessage.Password
                     };
                     _connection = parametro.CreateConnection();
-                    _log.Info($"Conexion a RabbitMq Existoso host!!!!! {_fecha.FechaNow().Result}");
+                    _log.Info($"Conexion a RabbitMq Existoso !!!!! {_fecha.FechaNow().Result}");
                     resp = true;
                 });
             }
             catch (Exception ex) {
 
-                _log.Fatal($"No se logro establecer conexion a  RabbitMq total de Intestos {contadorConexion}....{_fecha.FechaNow().Result} !!!");
+                _log.Fatal($"No se logro establecer conexion a  RabbitMq total de Intentos {contadorConexion}....{_fecha.FechaNow().Result} !!!");
                 _log.Warn($"Exception {ex.StackTrace} {_fecha.FechaNow().Result}");
             }
             return Task.FromResult(resp);
@@ -148,10 +148,10 @@ namespace SendMessage
             {
                 var policy = RetryPolicy.Handle<Exception>()
                            .Or<BrokerUnreachableException>()
-                       .WaitAndRetry(_retryCount, retryAttempt => TimeSpan.FromSeconds(Math.Pow(1, retryAttempt)), (ex, time) =>
+                       .WaitAndRetry(_retryCount, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)), (ex, time) =>
                            {
                            contador++;
-                               _log.Warn($"Intestos para poner mensage en cola en Rabbit {contador} -- {_fecha.FechaNow().Result}  ");
+                               _log.Warn($"Intentos para poner mensage en cola en Rabbit {contador} -- {_fecha.FechaNow().Result}  ");
                           });
 
                 if (Connection().Result)
@@ -185,6 +185,7 @@ namespace SendMessage
                             canales.WaitForConfirmsOrDie();
                             _emailRequest.Clear();
                             canales.Close();
+                            _connection.Close();
                         }
                         _log.Info($"Mensage puesto el cola en RabbitMq {_fecha.FechaNow().Result}");
                         resp = true;
@@ -194,7 +195,7 @@ namespace SendMessage
             }
             catch (Exception ex)
             {
-                _log.Fatal($"Total de intestos para ponder en cola en mensage {contador} {_fecha.FechaNow().Result}");
+                _log.Fatal($"Total de intentos para ponder en cola el mensage {contador} {_fecha.FechaNow().Result}");
                 _log.Warn($"No se pudo poner el mensage en cola de RabbitMq {ex.StackTrace} {_fecha.FechaNow().Result}");
                 resp = false;
             }
