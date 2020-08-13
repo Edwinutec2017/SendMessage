@@ -35,7 +35,7 @@ namespace SendMessage
         {
             parametersMessage = _parametersMessage;
             cuentaEmail = _cuentaEmail;
-            _retryCount = 5;
+            _retryCount = 4;
 
         }
         #endregion
@@ -99,7 +99,8 @@ namespace SendMessage
         #endregion
 
         #region CORREO
-        #region VALIDAR CONECION A RABBITMQ
+
+        #region VALIDAR conexion A RABBITMQ
         private Task<bool> Connection() {
             bool resp = false;
             int contadorConexion = 0;
@@ -110,7 +111,7 @@ namespace SendMessage
                 .WaitAndRetry(_retryCount, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)), (ex, time) =>
                 {
                     contadorConexion++;
-                    _log.Warn($"Reintento de conexion a RabbitMq.. {contadorConexion}");
+                    _log.Warn($"Estableciendo conexion a RabbitMq.. {contadorConexion} !!!!");
                 });
 
                 policyRabbit.Execute(() =>
@@ -123,13 +124,12 @@ namespace SendMessage
                         Password = parametersMessage.Password
                     };
                     _connection = parametro.CreateConnection();
-                    _log.Info($"Conexion a RabbitMq Existoso host :{parametersMessage.Host}");
+                    _log.Info($"Conexion a RabbitMq Existoso host!!!!! ");
                     resp = true;
                 });
             }
             catch (Exception ex) {
-
-                _log.Fatal($"No se logro establecer conexiona RabbitMq total de Intestos {contadorConexion}....{ex.StackTrace}");
+                _log.Fatal($"No se logro establecer conexion a  RabbitMq total de Intestos {contadorConexion}....{ex.StackTrace} !!!");
             }
             return Task.FromResult(resp);
 
