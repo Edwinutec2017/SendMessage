@@ -23,31 +23,30 @@ namespace SendMessage
         private string name = null;
         private string file = null;
         private ParametersMessage parametersMessage;
-        private CuentaEmail cuentaEmail;
-        private List<Base64FileRequest> base64 = null;
+        private List<Base64FileParams> base64 = null;
         private static int _retryCount;
         private IConnection _connection;
         private Fecha _fecha;
         private static int _contador;
         private static bool _resp;
-        private static readonly ILog _log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static  ILog _log ;
+
         #endregion
 
         #region CONSTRUCTOR
-        public Message(ParametersMessage _parametersMessage, CuentaEmail _cuentaEmail)
+        public Message(ParametersMessage _parametersMessage)
         {
             parametersMessage = _parametersMessage;
-            cuentaEmail = _cuentaEmail;
-            _retryCount = 4;
+            _retryCount = 5;
             _fecha = new Fecha();
             _contador = 0;
             _resp = false;
-
+            _log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         }
         #endregion
 
         #region ARCHIVO ADJUNTO
-        public async Task<bool> AdjuntoArchivo(List<string> ubicacion)
+        private async Task<List<Base64FileParams>> AdjuntoArchivo(List<string> ubicacion)
         {
 
             _resp = false;
@@ -63,7 +62,7 @@ namespace SendMessage
                     });
 
                 policyBase64.Execute(()=> {
-                    base64 = new List<Base64FileRequest>();
+                    base64 = new List<Base64FileParams>();
                     if (ubicacion != null)
                     {
                         if (ubicacion.Count > 0)
@@ -75,7 +74,7 @@ namespace SendMessage
                                     name = Path.GetFileName(ruta);
                                     file = Convert.ToBase64String(File.ReadAllBytes(ruta));
 
-                                    base64.Add(new Base64FileRequest()
+                                    base64.Add(new Base64FileParams()
                                     {
                                         FileName = name,
                                         Base64Data = file
@@ -98,7 +97,7 @@ namespace SendMessage
                 _resp = false;
             }
             Dispose();
-            return await Task.FromResult(_resp);
+            return await Task.FromResult(base64);
         }
         #endregion
 
@@ -130,7 +129,7 @@ namespace SendMessage
                 .WaitAndRetry(_retryCount, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)), (ex, time) =>
                 {
                     contadorConexion++;
-                    _log.Warn($"Intento {contadorConexion} para establecer la conexion a RabbitMq..  !!!! {_fecha.FechaNow().Result}");
+                    _log.Warn($"Intento {contadorConexion} para establecer la coneccion a RabbitMq..  !!!! {_fecha.FechaNow().Result}");
                 });
 
                 policyRabbit.Execute(() =>
@@ -143,7 +142,7 @@ namespace SendMessage
                         Password = parametersMessage.Password
                     };
                     _connection = parametro.CreateConnection();
-                    _log.Info($"Conexion a RabbitMq  !!!!! {_fecha.FechaNow().Result}");
+                    _log.Info($"Coneccion a RabbitMq  !!!!! {_fecha.FechaNow().Result}");
                     resp = true;
                 });
             }
@@ -157,39 +156,30 @@ namespace SendMessage
         }
         #endregion
 
-        public async Task<bool> Correo(ComplementEmail _complementEmail)
+        public async Task<bool> Publish(EmailParams _emailRequest)
         {
-            bool resp = false;
+            _resp = false;
             int contador = 0;
             try
             {
                 var policy = RetryPolicy.Handle<Exception>()
                            .Or<BrokerUnreachableException>()
-                       .WaitAndRetry(_retryCount, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)), (ex, time) =>
+                           .WaitAndRetry(_retryCount, retryAttempt => TimeSpan.FromSeconds(Math.Pow(3, retryAttempt)), (ex, time) =>
                            {
-                           contador++;
-                               _log.Warn($"Intento {contador} para poner mensage en cola en RabbitMq !!!  -- {_fecha.FechaNow().Result}  ");
+                            contador++;
+                             _log.Warn($"Intento {contador} para poner mensage en cola en RabbitMq !!!  -- {_fecha.FechaNow().Result}  ");
                           });
 
-                if (Connection().Result)
-                {
-                    policy.Execute(() => {
-                        _log.Info($"Iniciando Proceso de poner en cola en RabbitMQ {_fecha.FechaNow().Result}");
+                policy.Execute(() => {
+                    _log.Info($"Iniciando Proceso de poner en cola en RabbitMQ {_fecha.FechaNow().Result}");
+
+                    if (Connection().Result)
+                    {
                         using (var canales = _connection.CreateModel())
                         {
-                            var _emailRequest = new List<EmailRequest>()
+                            var _email = new List<EmailParams>()
                         {
-                            new EmailRequest()
-                            {
-                                CuentaMail=cuentaEmail.CuentaId,
-                                De= cuentaEmail.EnviaMail,
-                                Para=_complementEmail.Para,
-                                CC=_complementEmail.CopiaMail,
-                                Asunto=_complementEmail.Asunto,
-                                ParametrosDinamicos=parametros,
-                                Base64Files= base64
-
-                            }
+                           _emailRequest
                         };
                             var properties = canales.CreateBasicProperties();
                             properties.DeliveryMode = 2;
@@ -198,31 +188,29 @@ namespace SendMessage
                             exchange: parametersMessage.Channel,
                             routingKey: parametersMessage.Key,
                             basicProperties: properties,
-                            body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(_emailRequest)));
+                            body: Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(_email)));
                             canales.WaitForConfirmsOrDie();
-                            _emailRequest.Clear();
+                            _email.Clear();
                             canales.Close();
                             _connection.Close();
+                            _log.Info($"Mensage puesto en la cola en RabbitMq {_fecha.FechaNow().Result}");
+                            _resp = true;
                         }
-                        _log.Info($"Mensage puesto el cola en RabbitMq {_fecha.FechaNow().Result}");
-                        resp = true;
-                    });
-                }
-
+                    }
+                });
             }
             catch (Exception ex)
             {
-                _log.Fatal($"Total de intentos para ponder en cola el mensage {contador} {_fecha.FechaNow().Result}");
+                _log.Fatal($"Total de intentos para poner en cola el mensage {contador} {_fecha.FechaNow().Result}");
                 _log.Warn($"Excepcion {ex.StackTrace} {_fecha.FechaNow().Result}");
-                resp = false;
             }
             Dispose();
-            return await Task.FromResult(resp);
+            return await Task.FromResult(_resp);
         }
         #endregion
 
         #region PARAMETROS DINAMICOS
-        public async Task<bool> ParametrosDinamicos(object parametros)
+        private async Task<bool> ParametrosDinamicos(object parametros)
         {
             bool resp=false;
             try

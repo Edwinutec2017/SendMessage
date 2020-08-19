@@ -14,19 +14,6 @@ namespace SendMessage.Class
         public string Key { get; set; }
     }
     #endregion
-    #region PARAMETROS DE CUENTA
-    public class CuentaEmail {
-        public string CuentaId { get; set; }
-        public string EnviaMail { get; set; }
 
-    }
-    #endregion
-    #region Complementos Email
-    public class ComplementEmail {
-        public string Asunto { get; set; }
-        public List<string> Para { get; set; }
-        public List<string> CopiaMail { get; set; }
-    }
-    #endregion
 
 }

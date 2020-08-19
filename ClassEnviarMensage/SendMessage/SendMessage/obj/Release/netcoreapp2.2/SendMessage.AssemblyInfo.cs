@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyDescriptionAttribute("Para Mandar colas A Rabbit\r\nCon resilencia")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.6")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.19")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.23")]
 [assembly: System.Reflection.AssemblyProductAttribute("SendMessage")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SendMessage")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.6")]
