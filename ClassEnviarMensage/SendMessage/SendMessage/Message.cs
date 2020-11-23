@@ -23,7 +23,7 @@ namespace SendMessage
         private string name = null;
         private string file = null;
         private ParametersMessage parametersMessage;
-        private List<Base64FileParams> base64 = null;
+        private List<Base64FileReques> base64 = null;
         private static int _retryCount;
         private IConnection _connection;
         private Fecha _fecha;
@@ -46,7 +46,7 @@ namespace SendMessage
         #endregion
 
         #region ARCHIVO ADJUNTO
-        private async Task<List<Base64FileParams>> AdjuntoArchivo(List<string> ubicacion)
+        private async Task<List<Base64FileReques>> AdjuntoArchivo(List<string> ubicacion)
         {
 
             _resp = false;
@@ -62,7 +62,7 @@ namespace SendMessage
                     });
 
                 policyBase64.Execute(()=> {
-                    base64 = new List<Base64FileParams>();
+                    base64 = new List<Base64FileReques>();
                     if (ubicacion != null)
                     {
                         if (ubicacion.Count > 0)
@@ -74,7 +74,7 @@ namespace SendMessage
                                     name = Path.GetFileName(ruta);
                                     file = Convert.ToBase64String(File.ReadAllBytes(ruta));
 
-                                    base64.Add(new Base64FileParams()
+                                    base64.Add(new Base64FileReques()
                                     {
                                         FileName = name,
                                         Base64Data = file
@@ -137,7 +137,7 @@ namespace SendMessage
                     var parametro = new ConnectionFactory
                     {
                         HostName = parametersMessage.Host,
-                        Port = AmqpTcpEndpoint.UseDefaultPort,
+                        Port = parametersMessage.Port,
                         UserName = parametersMessage.UserRabbitMQ,
                         Password = parametersMessage.Password
                     };
@@ -156,18 +156,17 @@ namespace SendMessage
         }
         #endregion
 
-        public async Task<bool> Publish(EmailParams _emailRequest)
+        public async Task<bool> Publish(EmailReques _emailRequest)
         {
             _resp = false;
-            int contador = 0;
             try
             {
                 var policy = RetryPolicy.Handle<Exception>()
                            .Or<BrokerUnreachableException>()
                            .WaitAndRetry(_retryCount, retryAttempt => TimeSpan.FromSeconds(Math.Pow(3, retryAttempt)), (ex, time) =>
                            {
-                            contador++;
-                             _log.Warn($"Intento {contador} para poner mensage en cola en RabbitMq !!!  -- {_fecha.FechaNow().Result}  ");
+                        
+                             _log.Warn($"Intento para poner mensage en cola en RabbitMq !!!  -- {_fecha.FechaNow().Result}  ");
                           });
 
                 policy.Execute(() => {
@@ -177,7 +176,7 @@ namespace SendMessage
                     {
                         using (var canales = _connection.CreateModel())
                         {
-                            var _email = new List<EmailParams>()
+                            var _email = new List<EmailReques>()
                         {
                            _emailRequest
                         };
@@ -201,7 +200,7 @@ namespace SendMessage
             }
             catch (Exception ex)
             {
-                _log.Fatal($"Total de intentos para poner en cola el mensage {contador} {_fecha.FechaNow().Result}");
+                _log.Fatal($"Total de intentos para poner en cola el mensage {_contador} {_fecha.FechaNow().Result}");
                 _log.Warn($"Excepcion {ex.StackTrace} {_fecha.FechaNow().Result}");
             }
             Dispose();

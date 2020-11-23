@@ -8,6 +8,7 @@ namespace SendMessage.Class
     public class ParametersMessage
     {
         public string Host { get; set; }
+        public int Port { get; set; }
         public string UserRabbitMQ { get; set; }
         public string Password { get; set; }
         public string Channel { get; set; }

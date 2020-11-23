@@ -4,7 +4,7 @@ using System.Text;
 
 namespace SendMessage.Class
 {
-    public class EmailParams
+ public class EmailReques
     {
         #region PROPERTIES
         public string CuentaMail { get; set; }
@@ -14,12 +14,12 @@ namespace SendMessage.Class
         public List<string> CC { get; set; }
         public List<string> CCO { get; set; }
         public string RutaArchivo { get; set; }
-        public List<Base64FileParams> Base64Files { get; set; }
+        public List<Base64FileReques> Base64Files { get; set; }
         public dynamic ParametrosDinamicos { get; set; }
         public bool Enviado { get; set; }
         #endregion
     }
-    public class Base64FileParams
+    public class Base64FileReques
     {
         #region PROPERTIES
         public string Base64Data { get; set; }

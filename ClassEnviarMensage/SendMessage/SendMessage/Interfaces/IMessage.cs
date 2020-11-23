@@ -7,6 +7,6 @@ namespace SendMessage.Interfaces
 {
    public interface IMessage:IDisposable
     {
-        Task<bool> Publish(EmailParams _emailRequest);
+        Task<bool> Publish(EmailReques _emailRequest);
     }
 }
